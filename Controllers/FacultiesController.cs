@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SmartCollegeMS.Data;
 using SmartCollegeMS.Models;
+using Microsoft.AspNetCore.Authorization; // Added for Security
 
 namespace SmartCollegeMS.Controllers
 {
+    [Authorize] // Added for Security
     public class FacultiesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -50,8 +51,6 @@ namespace SmartCollegeMS.Controllers
         }
 
         // POST: Faculties/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FacultyId,Name,Email,Department,Phone")] Faculty faculty)
@@ -82,8 +81,6 @@ namespace SmartCollegeMS.Controllers
         }
 
         // POST: Faculties/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FacultyId,Name,Email,Department,Phone")] Faculty faculty)

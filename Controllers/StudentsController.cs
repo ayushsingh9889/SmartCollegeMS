@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SmartCollegeMS.Data;
 using SmartCollegeMS.Models;
+using Microsoft.AspNetCore.Authorization; // Added for Security
 
 namespace SmartCollegeMS.Controllers
 {
+    [Authorize] // Added for Security
     public class StudentsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,10 +21,26 @@ namespace SmartCollegeMS.Controllers
             _context = context;
         }
 
-        // GET: Students
-        public async Task<IActionResult> Index()
+        // GET: Students (Updated with Search & Filter)
+        public async Task<IActionResult> Index(string searchString, string department)
         {
-            return View(await _context.Students.ToListAsync());
+            var students = _context.Students.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                students = students.Where(s => s.FullName.Contains(searchString) || s.StudentId.Contains(searchString));
+            }
+
+            if (!string.IsNullOrWhiteSpace(department))
+            {
+                students = students.Where(s => s.Department == department);
+            }
+
+            ViewData["CurrentSearch"] = searchString;
+            ViewData["CurrentDepartment"] = department;
+            ViewBag.Departments = await _context.Students.Select(s => s.Department).Distinct().ToListAsync();
+
+            return View(await students.ToListAsync());
         }
 
         // GET: Students/Details/5
@@ -50,8 +68,6 @@ namespace SmartCollegeMS.Controllers
         }
 
         // POST: Students/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,StudentId,FullName,Email,Phone,Department,Semester,RegistrationDate")] Student student)
@@ -82,8 +98,6 @@ namespace SmartCollegeMS.Controllers
         }
 
         // POST: Students/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,StudentId,FullName,Email,Phone,Department,Semester,RegistrationDate")] Student student)

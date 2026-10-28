@@ -4,41 +4,61 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
-    <h2 class="text-primary fw-bold m-0"><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
-    <span class="text-muted fw-bold">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</span>
+<style>
+    .stat-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 12px; }
+    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important; }
+    .chart-card { border-radius: 12px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+    <h2 class="fw-bold m-0" style="color: #0a192f;"><i class="bi bi-grid-1x2-fill me-2"></i> Admin Dashboard</h2>
+    <span class="badge bg-light text-dark border px-3 py-2 fw-bold shadow-sm rounded-pill">
+        <i class="bi bi-calendar3 me-1"></i> @DateTime.Now.ToString("dddd, dd MMMM yyyy")
+    </span>
 </div>
 
 <!-- Statistic Cards -->
-<div class="row g-3 mb-4">
+<div class="row g-4 mb-4">
     <div class="col-md-3">
-        <div class="card shadow-sm border-0 bg-primary text-white h-100">
-            <div class="card-body">
-                <h6 class="text-uppercase text-white-50">Total Students</h6>
+        <div class="card stat-card shadow-sm border-0 h-100" style="background: linear-gradient(135deg, #0a192f, #112240); color: white;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-uppercase text-white-50 fw-bold mb-0">Total Students</h6>
+                    <i class="bi bi-people-fill fs-3" style="color: #64ffda;"></i>
+                </div>
                 <h2 class="mb-0 fw-bold">@Model.TotalStudents</h2>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow-sm border-0 bg-info text-dark h-100">
-            <div class="card-body">
-                <h6 class="text-uppercase opacity-75">Total Faculty</h6>
+        <div class="card stat-card shadow-sm border-0 h-100" style="background: linear-gradient(135deg, #0dcaf0, #0aa2c0); color: white;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-uppercase text-white-50 fw-bold mb-0">Total Faculty</h6>
+                    <i class="bi bi-person-badge-fill fs-3 text-white"></i>
+                </div>
                 <h2 class="mb-0 fw-bold">@Model.TotalFaculty</h2>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow-sm border-0 bg-success text-white h-100">
-            <div class="card-body">
-                <h6 class="text-uppercase text-white-50">Present Today</h6>
+        <div class="card stat-card shadow-sm border-0 h-100" style="background: linear-gradient(135deg, #198754, #146c43); color: white;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-uppercase text-white-50 fw-bold mb-0">Present Today</h6>
+                    <i class="bi bi-check-circle-fill fs-3 text-white"></i>
+                </div>
                 <h2 class="mb-0 fw-bold">@Model.PresentToday</h2>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow-sm border-0 bg-danger text-white h-100">
-            <div class="card-body">
-                <h6 class="text-uppercase text-white-50">Absent Today</h6>
+        <div class="card stat-card shadow-sm border-0 h-100" style="background: linear-gradient(135deg, #dc3545, #b02a37); color: white;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="text-uppercase text-white-50 fw-bold mb-0">Absent Today</h6>
+                    <i class="bi bi-x-circle-fill fs-3 text-white"></i>
+                </div>
                 <h2 class="mb-0 fw-bold">@Model.AbsentToday</h2>
             </div>
         </div>
@@ -46,23 +66,76 @@
 </div>
 
 <!-- Chart Section -->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-white py-3">
-        <h5 class="mb-0 fw-bold text-secondary">Attendance Trend (Last 7 Days)</h5>
+<div class="card chart-card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white py-3 border-bottom-0">
+        <h5 class="mb-0 fw-bold" style="color: #0a192f;"><i class="bi bi-bar-chart-line-fill me-2"></i> Attendance Trend (Last 7 Days)</h5>
     </div>
-    <div class="card-body">
-        <canvas id="attendanceChart" style="max-height: 350px;"></canvas>
+    <div class="card-body p-4">
+        <canvas id="attendanceChart" style="max-height: 350px; width: 100%;"></canvas>
+    </div>
+</div>
+
+<!-- Data Lists Section -->
+<div class="row g-4 mb-5">
+    <!-- Recent Students -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold" style="color: #0a192f;"><i class="bi bi-people me-2"></i> Recently Added Students</h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @if(Model.RecentStudents.Any()) {
+                        foreach(var student in Model.RecentStudents) {
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@student.FullName</h6>
+                                    <small class="text-muted">ID: @student.StudentId | Dept: @student.Department</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">Sem @student.Semester</span>
+                            </li>
+                        }
+                    } else {
+                        <li class="list-group-item text-center text-muted py-4">No students found.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Faculty -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold" style="color: #0a192f;"><i class="bi bi-person-badge me-2"></i> Recently Added Faculty</h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @if(Model.RecentFaculties.Any()) {
+                        foreach(var faculty in Model.RecentFaculties) {
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@faculty.Name</h6>
+                                    <small class="text-muted">ID: @faculty.FacultyId | Dept: @faculty.Department</small>
+                                </div>
+                                <span class="badge bg-info text-dark rounded-pill">Faculty</span>
+                            </li>
+                        }
+                    } else {
+                        <li class="list-group-item text-center text-muted py-4">No faculty found.</li>
+                    }
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const ctx = document.getElementById('attendanceChart').getContext('2d');
             
-            // Get data from C#
             const labels = @Html.Raw(Json.Serialize(Model.ChartLabels));
             const presentData = @Html.Raw(Json.Serialize(Model.ChartDataPresent));
             const absentData = @Html.Raw(Json.Serialize(Model.ChartDataAbsent));
@@ -72,30 +145,19 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        {
-                            label: 'Present',
-                            data: presentData,
-                            backgroundColor: '#198754', // Bootstrap success green
-                            borderRadius: 4
-                        },
-                        {
-                            label: 'Absent',
-                            data: absentData,
-                            backgroundColor: '#dc3545', // Bootstrap danger red
-                            borderRadius: 4
-                        }
+                        { label: 'Present', data: presentData, backgroundColor: '#198754', borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.6 },
+                        { label: 'Absent', data: absentData, backgroundColor: '#dc3545', borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.6 }
                     ]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top' }
+                        legend: { position: 'top', labels: { font: { family: 'Segoe UI, sans-serif', size: 13, weight: 'bold' }, usePointStyle: true, boxWidth: 8 } }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 }
-                        }
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#6c757d' }, grid: { color: '#e9ecef', borderDash: [5, 5] } },
+                        x: { ticks: { color: '#6c757d' }, grid: { display: false } }
                     }
                 }
             });

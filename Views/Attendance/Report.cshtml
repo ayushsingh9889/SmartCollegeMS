@@ -1,0 +1,82 @@
+@model IEnumerable<SmartCollegeMS.Models.Attendance>
+
+@{
+    ViewData["Title"] = "Attendance Reports";
+    var start = ViewData["StartDate"] as string;
+    var end = ViewData["EndDate"] as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2 class="text-primary fw-bold m-0"><i class="bi bi-file-earmark-bar-graph"></i> Attendance Reports</h2>
+    <a href="/Attendance/Index" class="btn btn-outline-primary fw-bold">Back to Marking</a>
+</div>
+
+<div class="card shadow-sm border-0 mb-4 bg-light">
+    <div class="card-body">
+        <form asp-action="Report" method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="fw-bold">Start Date</label>
+                <input type="date" name="startDate" value="@start" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <label class="fw-bold">End Date</label>
+                <input type="date" name="endDate" value="@end" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100 fw-bold"><i class="bi bi-funnel"></i> Filter Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 fw-bold text-secondary">Report Data</h5>
+        <a href="/Attendance/ExportCsv?startDate=@start&endDate=@end" class="btn btn-success btn-sm fw-bold">
+            <i class="bi bi-file-earmark-excel"></i> Download CSV
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-striped table-hover mb-0">
+            <thead class="bg-dark text-white">
+                <tr>
+                    <th class="py-3 px-4">Date</th>
+                    <th class="py-3">Student ID</th>
+                    <th class="py-3">Student Name</th>
+                    <th class="py-3">Department</th>
+                    <th class="py-3 text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr class="align-middle">
+                            <td class="px-4 fw-bold text-secondary">@item.Date.ToString("dd-MMM-yyyy")</td>
+                            <td>@(item.Student?.StudentId ?? "-")</td>
+                            <td>@(item.Student?.FullName ?? "-")</td>
+                            <td>@(item.Student?.Department ?? "-")</td>
+                            <td class="text-center">
+                                @if (item.IsPresent)
+                                {
+                                    <span class="badge bg-success">Present</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Absent</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No attendance records found for this date range.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

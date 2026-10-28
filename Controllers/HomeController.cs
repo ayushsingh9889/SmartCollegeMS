@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using SmartCollegeMS.Data;
 using SmartCollegeMS.Models;
 using SmartCollegeMS.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartCollegeMS.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -51,6 +53,10 @@ namespace SmartCollegeMS.Controllers
                 model.ChartDataPresent.Add(dayAttendance.Count(a => a.IsPresent));
                 model.ChartDataAbsent.Add(dayAttendance.Count(a => !a.IsPresent));
             }
+
+            // Fetch recent data for Dashboard Lists
+            model.RecentStudents = await _context.Students.OrderByDescending(s => s.Id).Take(5).ToListAsync();
+            model.RecentFaculties = await _context.Faculties.OrderByDescending(f => f.Id).Take(5).ToListAsync();
 
             return View(model);
         }

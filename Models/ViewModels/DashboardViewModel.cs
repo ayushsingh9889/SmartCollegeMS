@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace SmartCollegeMS.Models.ViewModels
 {
     public class DashboardViewModel
@@ -12,5 +15,9 @@ namespace SmartCollegeMS.Models.ViewModels
         public List<string> ChartLabels { get; set; } = new List<string>();
         public List<int> ChartDataPresent { get; set; } = new List<int>();
         public List<int> ChartDataAbsent { get; set; } = new List<int>();
+
+        // For Recent Data Lists
+        public List<SmartCollegeMS.Models.Student> RecentStudents { get; set; } = new List<SmartCollegeMS.Models.Student>();
+        public List<SmartCollegeMS.Models.Faculty> RecentFaculties { get; set; } = new List<SmartCollegeMS.Models.Faculty>();
     }
 }
