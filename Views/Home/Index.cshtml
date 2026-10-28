@@ -1,8 +1,104 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model SmartCollegeMS.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2 class="text-primary fw-bold m-0"><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
+    <span class="text-muted fw-bold">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</span>
 </div>
+
+<!-- Statistic Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-primary text-white h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase text-white-50">Total Students</h6>
+                <h2 class="mb-0 fw-bold">@Model.TotalStudents</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-info text-dark h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase opacity-75">Total Faculty</h6>
+                <h2 class="mb-0 fw-bold">@Model.TotalFaculty</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-success text-white h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase text-white-50">Present Today</h6>
+                <h2 class="mb-0 fw-bold">@Model.PresentToday</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-danger text-white h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase text-white-50">Absent Today</h6>
+                <h2 class="mb-0 fw-bold">@Model.AbsentToday</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Section -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold text-secondary">Attendance Trend (Last 7 Days)</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="attendanceChart" style="max-height: 350px;"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            
+            // Get data from C#
+            const labels = @Html.Raw(Json.Serialize(Model.ChartLabels));
+            const presentData = @Html.Raw(Json.Serialize(Model.ChartDataPresent));
+            const absentData = @Html.Raw(Json.Serialize(Model.ChartDataAbsent));
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Present',
+                            data: presentData,
+                            backgroundColor: '#198754', // Bootstrap success green
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Absent',
+                            data: absentData,
+                            backgroundColor: '#dc3545', // Bootstrap danger red
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
